@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #030712;
+  --bg-card: #0d1117;
+  --bg-elevated: #111827;
+  --border: #1f2937;
+  --border-light: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --success: #22c55e;
+  --warning: #f97316;
+  --danger: #ef4444;
+  --yellow: #eab308;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-elevated); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.animate-fade-in { animation: fadeIn 0.4s ease forwards; }
+.animate-spin-slow { animation: spin 2s linear infinite; }
+
+/* Progress bar shimmer */
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.shimmer {
+  background: linear-gradient(90deg, #6366f1 25%, #818cf8 50%, #6366f1 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

@@ -1,0 +1,25 @@
+# Backend
+backend/target/
+backend/*.jar
+*.class
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Temp repos
+/tmp/repointel/
+
+# Env
+.env
+.env.local
