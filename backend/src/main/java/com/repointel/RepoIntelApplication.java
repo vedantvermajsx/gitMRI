@@ -11,5 +11,3 @@ public class RepoIntelApplication {
         SpringApplication.run(RepoIntelApplication.class, args);
     }
 }
-
-

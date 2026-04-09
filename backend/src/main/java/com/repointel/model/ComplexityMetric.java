@@ -1,17 +1,9 @@
 package com.repointel.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 @Entity
 @Table(name = "complexity_metrics")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class ComplexityMetric {
 
     @Id
@@ -47,4 +39,46 @@ public class ComplexityMetric {
 
     @Column(name = "end_line")
     private int endLine;
+
+    public ComplexityMetric() {}
+
+    public Long getId() { return id; }
+    public String getJobId() { return jobId; }
+    public String getFilePath() { return filePath; }
+    public String getPackageName() { return packageName; }
+    public String getClassName() { return className; }
+    public String getMethodName() { return methodName; }
+    public int getCcScore() { return ccScore; }
+    public int getLineCount() { return lineCount; }
+    public int getNestingDepth() { return nestingDepth; }
+    public int getStartLine() { return startLine; }
+    public int getEndLine() { return endLine; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setJobId(String v) { this.jobId = v; }
+    public void setFilePath(String v) { this.filePath = v; }
+    public void setPackageName(String v) { this.packageName = v; }
+    public void setClassName(String v) { this.className = v; }
+    public void setMethodName(String v) { this.methodName = v; }
+    public void setCcScore(int v) { this.ccScore = v; }
+    public void setLineCount(int v) { this.lineCount = v; }
+    public void setNestingDepth(int v) { this.nestingDepth = v; }
+    public void setStartLine(int v) { this.startLine = v; }
+    public void setEndLine(int v) { this.endLine = v; }
+
+    public static Builder builder() { return new Builder(); }
+    public static class Builder {
+        private final ComplexityMetric m = new ComplexityMetric();
+        public Builder jobId(String v) { m.jobId = v; return this; }
+        public Builder filePath(String v) { m.filePath = v; return this; }
+        public Builder packageName(String v) { m.packageName = v; return this; }
+        public Builder className(String v) { m.className = v; return this; }
+        public Builder methodName(String v) { m.methodName = v; return this; }
+        public Builder ccScore(int v) { m.ccScore = v; return this; }
+        public Builder lineCount(int v) { m.lineCount = v; return this; }
+        public Builder nestingDepth(int v) { m.nestingDepth = v; return this; }
+        public Builder startLine(int v) { m.startLine = v; return this; }
+        public Builder endLine(int v) { m.endLine = v; return this; }
+        public ComplexityMetric build() { return m; }
+    }
 }

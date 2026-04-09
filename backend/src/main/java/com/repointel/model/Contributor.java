@@ -1,19 +1,10 @@
 package com.repointel.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "contributors")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Contributor {
 
     @Id
@@ -46,4 +37,43 @@ public class Contributor {
 
     @Column(name = "last_commit")
     private LocalDateTime lastCommit;
+
+    public Contributor() {}
+
+    public Long getId() { return id; }
+    public String getJobId() { return jobId; }
+    public String getAuthorName() { return authorName; }
+    public String getAuthorEmail() { return authorEmail; }
+    public int getCommitCount() { return commitCount; }
+    public int getFilesOwned() { return filesOwned; }
+    public int getLinesAdded() { return linesAdded; }
+    public int getLinesRemoved() { return linesRemoved; }
+    public LocalDateTime getFirstCommit() { return firstCommit; }
+    public LocalDateTime getLastCommit() { return lastCommit; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setJobId(String v) { this.jobId = v; }
+    public void setAuthorName(String v) { this.authorName = v; }
+    public void setAuthorEmail(String v) { this.authorEmail = v; }
+    public void setCommitCount(int v) { this.commitCount = v; }
+    public void setFilesOwned(int v) { this.filesOwned = v; }
+    public void setLinesAdded(int v) { this.linesAdded = v; }
+    public void setLinesRemoved(int v) { this.linesRemoved = v; }
+    public void setFirstCommit(LocalDateTime v) { this.firstCommit = v; }
+    public void setLastCommit(LocalDateTime v) { this.lastCommit = v; }
+
+    public static Builder builder() { return new Builder(); }
+    public static class Builder {
+        private final Contributor c = new Contributor();
+        public Builder jobId(String v) { c.jobId = v; return this; }
+        public Builder authorName(String v) { c.authorName = v; return this; }
+        public Builder authorEmail(String v) { c.authorEmail = v; return this; }
+        public Builder commitCount(int v) { c.commitCount = v; return this; }
+        public Builder filesOwned(int v) { c.filesOwned = v; return this; }
+        public Builder linesAdded(int v) { c.linesAdded = v; return this; }
+        public Builder linesRemoved(int v) { c.linesRemoved = v; return this; }
+        public Builder firstCommit(LocalDateTime v) { c.firstCommit = v; return this; }
+        public Builder lastCommit(LocalDateTime v) { c.lastCommit = v; return this; }
+        public Contributor build() { return c; }
+    }
 }

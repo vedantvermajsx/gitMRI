@@ -1,61 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-base: #030712;
-  --bg-card: #0d1117;
-  --bg-elevated: #111827;
-  --border: #1f2937;
-  --border-light: #374151;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --accent: #6366f1;
-  --accent-light: #818cf8;
-  --success: #22c55e;
-  --warning: #f97316;
-  --danger: #ef4444;
-  --yellow: #eab308;
+  --bg-base:     #03040a;
+  --bg-card:     #080c14;
+  --bg-elevated: #0e1420;
+  --bg-hover:    #131926;
+  --border:      #1a2235;
+  --border-md:   #243048;
+  --border-light:#2e3f5c;
+  --text-primary: #e8edf5;
+  --text-secondary:#8d9db8;
+  --text-muted:  #4d5f7a;
+  --accent:      #3b82f6;
+  --accent-glow: rgba(59,130,246,0.25);
+  --accent-dim:  #1d4ed8;
+  --cyan:        #06b6d4;
+  --green:       #10b981;
+  --orange:      #f97316;
+  --red:         #ef4444;
+  --yellow:      #f59e0b;
+  --purple:      #8b5cf6;
 }
 
-* { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
+  font-family: 'Syne', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.font-mono { font-family: 'JetBrains Mono', monospace; }
+/* ── Noise texture overlay ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  opacity: 0.6;
+}
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-elevated); }
-::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+/* ── Mono font ── */
+code, .mono, [class*="font-mono"] {
+  font-family: 'IBM Plex Mono', monospace !important;
+}
 
-/* Card */
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Hidden scrollbar — scrollable but no visible bar */
+.scroll-hidden { overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.scroll-hidden::-webkit-scrollbar { display: none; }
+
+/* ── Cards ── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-glass {
+  background: rgba(8, 12, 20, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
   padding: 20px;
 }
 
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ── Glow effects ── */
+.glow-blue { box-shadow: 0 0 24px rgba(59,130,246,0.15), 0 0 48px rgba(59,130,246,0.05); }
+.glow-green { box-shadow: 0 0 24px rgba(16,185,129,0.15); }
+.glow-red { box-shadow: 0 0 24px rgba(239,68,68,0.15); }
+.glow-orange { box-shadow: 0 0 24px rgba(249,115,22,0.15); }
 
-.animate-fade-in { animation: fadeIn 0.4s ease forwards; }
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.btn-primary {
+  background: var(--accent); color: white; border-color: var(--accent);
+}
+.btn-primary:hover { background: #2563eb; box-shadow: 0 0 20px var(--accent-glow); }
+.btn-ghost {
+  background: var(--bg-elevated); color: var(--text-secondary); border-color: var(--border-md);
+}
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-light); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 6px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
+}
+
+/* ── Input ── */
+.input {
+  background: var(--bg-elevated); border: 1px solid var(--border-md);
+  border-radius: 10px; color: var(--text-primary);
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  padding: 10px 14px; outline: none; transition: all 0.15s;
+  width: 100%;
+}
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.input::placeholder { color: var(--text-muted); }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -400% 0; }
+  100% { background-position:  400% 0; }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.animate-fade-up  { animation: fadeUp 0.45s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-fade-in  { animation: fadeIn 0.3s ease forwards; }
 .animate-spin-slow { animation: spin 2s linear infinite; }
 
-/* Progress bar shimmer */
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-.shimmer {
-  background: linear-gradient(90deg, #6366f1 25%, #818cf8 50%, #6366f1 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+/* Stagger children */
+.stagger > *:nth-child(1) { animation-delay: 0.00s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.18s; }
+.stagger > *:nth-child(5) { animation-delay: 0.24s; }
+.stagger > *:nth-child(6) { animation-delay: 0.30s; }
+
+/* ── Progress shimmer ── */
+.shimmer-bar {
+  background: linear-gradient(90deg,
+    var(--accent-dim) 0%,
+    var(--accent) 40%,
+    var(--cyan) 60%,
+    var(--accent) 80%,
+    var(--accent-dim) 100%);
+  background-size: 400% 100%;
+  animation: shimmer 2s linear infinite;
 }
+
+/* ── Scanline effect (decorative) ── */
+.scanline::after {
+  content: '';
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.15), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+.data-table th { color: var(--text-muted); font-weight: 500; text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr { transition: background 0.1s; }
+.data-table tbody tr:hover { background: var(--bg-elevated); }

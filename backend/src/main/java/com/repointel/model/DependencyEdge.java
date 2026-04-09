@@ -1,17 +1,9 @@
 package com.repointel.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 @Entity
 @Table(name = "dependency_edges")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class DependencyEdge {
 
     @Id
@@ -26,4 +18,25 @@ public class DependencyEdge {
 
     @Column(name = "target_id", nullable = false)
     private Long targetId;
+
+    public DependencyEdge() {}
+
+    public Long getId() { return id; }
+    public String getJobId() { return jobId; }
+    public Long getSourceId() { return sourceId; }
+    public Long getTargetId() { return targetId; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setJobId(String v) { this.jobId = v; }
+    public void setSourceId(Long v) { this.sourceId = v; }
+    public void setTargetId(Long v) { this.targetId = v; }
+
+    public static Builder builder() { return new Builder(); }
+    public static class Builder {
+        private final DependencyEdge e = new DependencyEdge();
+        public Builder jobId(String v) { e.jobId = v; return this; }
+        public Builder sourceId(Long v) { e.sourceId = v; return this; }
+        public Builder targetId(Long v) { e.targetId = v; return this; }
+        public DependencyEdge build() { return e; }
+    }
 }

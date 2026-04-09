@@ -1,97 +1,160 @@
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listJobs, deleteJob } from '../api/client'
 
-const statusColor = {
-  DONE: { bg: '#14532d', text: '#86efac' },
-  FAILED: { bg: '#7f1d1d', text: '#fca5a5' },
-  PENDING: { bg: '#1e1b4b', text: '#a5b4fc' },
-  CLONING: { bg: '#1e1b4b', text: '#a5b4fc' },
-  PARSING: { bg: '#1e1b4b', text: '#a5b4fc' },
-  ANALYZING: { bg: '#1e1b4b', text: '#a5b4fc' },
-  HOTSPOTS: { bg: '#1e1b4b', text: '#a5b4fc' },
-  DEPENDENCIES: { bg: '#1e1b4b', text: '#a5b4fc' },
-  REPORTING: { bg: '#1e1b4b', text: '#a5b4fc' },
+const STATUS_CFG = {
+  DONE:         { color: '#10b981', bg: 'rgba(16,185,129,0.1)',  label: 'Done'     },
+  FAILED:       { color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   label: 'Failed'   },
+  PENDING:      { color: '#6b7280', bg: 'rgba(107,114,128,0.1)', label: 'Pending'  },
+  CLONING:      { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)',  label: 'Cloning'  },
+  PARSING:      { color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)',  label: 'Parsing'  },
+  ANALYZING:    { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  label: 'Analyzing'},
+  HOTSPOTS:     { color: '#f97316', bg: 'rgba(249,115,22,0.1)',  label: 'Git'      },
+  DEPENDENCIES: { color: '#06b6d4', bg: 'rgba(6,182,212,0.1)',   label: 'Deps'     },
+  REPORTING:    { color: '#84cc16', bg: 'rgba(132,204,22,0.1)',  label: 'Reporting'},
+}
+
+function StatusBadge({ status }) {
+  const cfg = STATUS_CFG[status] || STATUS_CFG.PENDING
+  const isActive = !['DONE','FAILED'].includes(status)
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      fontFamily: 'IBM Plex Mono', fontSize: 10, fontWeight: 600,
+      padding: '3px 10px', borderRadius: 99,
+      background: cfg.bg, color: cfg.color,
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: cfg.color, animation: isActive ? 'pulse-glow 2s ease infinite' : 'none' }} />
+      {cfg.label}
+    </span>
+  )
 }
 
 export default function History() {
-  const qc = useQueryClient()
-  const { data: jobs = [], isLoading } = useQuery({
+  const { data: jobs = [], isLoading, refetch } = useQuery({
     queryKey: ['jobs'],
     queryFn: listJobs,
+    refetchInterval: 5000,
   })
 
-  const { mutate: remove } = useMutation({
-    mutationFn: deleteJob,
-    onSuccess: () => qc.invalidateQueries(['jobs']),
-  })
+  const handleDelete = async (jobId) => {
+    await deleteJob(jobId)
+    refetch()
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
-      <header className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-        <Link to="/" className="font-mono font-black text-xl">
-          REPO<span style={{ color: 'var(--accent)' }}>INTEL</span>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
+      {/* Nav */}
+      <nav style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '16px 32px', borderBottom: '1px solid var(--border)',
+        background: 'rgba(3,4,10,0.85)', backdropFilter: 'blur(16px)',
+        position: 'sticky', top: 0, zIndex: 50,
+      }}>
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            width: 24, height: 24, borderRadius: 6, background: 'var(--accent)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 12, fontWeight: 800, color: 'white',
+          }}>R</div>
+          <span style={{ fontFamily: 'IBM Plex Mono', fontWeight: 700, fontSize: 13, color: 'var(--text-secondary)' }}>
+            repo<span style={{ color: 'var(--accent)' }}>intel</span>
+          </span>
         </Link>
-        <Link to="/" className="font-mono text-sm px-4 py-2 rounded-lg"
-          style={{ background: 'var(--accent)', color: 'white' }}>
+        <Link to="/" className="btn btn-primary" style={{ fontSize: 11 }}>
           + New Analysis
         </Link>
-      </header>
+      </nav>
 
-      <main className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="font-mono font-black text-2xl mb-8">Past Analyses</h1>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 32, marginBottom: 6 }}>Analysis History</h1>
+          <p style={{ fontFamily: 'IBM Plex Mono', fontSize: 12, color: 'var(--text-muted)' }}>
+            {jobs.length} past {jobs.length === 1 ? 'analysis' : 'analyses'}
+          </p>
+        </div>
 
         {isLoading ? (
-          <div className="text-center py-20" style={{ color: 'var(--text-muted)' }}>Loading...</div>
+          <div style={{ fontFamily: 'IBM Plex Mono', fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: 60 }}>
+            Loading...
+          </div>
         ) : jobs.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-4xl mb-4">📂</div>
-            <p style={{ color: 'var(--text-muted)' }}>No analyses yet.</p>
-            <Link to="/" className="font-mono text-sm mt-4 inline-block" style={{ color: 'var(--accent)' }}>
-              Start your first →
-            </Link>
+          <div className="card" style={{ textAlign: 'center', padding: 60 }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>◎</div>
+            <div style={{ fontFamily: 'Syne', fontWeight: 700, fontSize: 18, marginBottom: 8 }}>No analyses yet</div>
+            <p style={{ fontFamily: 'IBM Plex Mono', fontSize: 11, color: 'var(--text-muted)', marginBottom: 20 }}>
+              Analyze your first Java repository to see results here
+            </p>
+            <Link to="/" className="btn btn-primary">Start Analysis →</Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {jobs.map(job => {
-              const colors = statusColor[job.status] || statusColor.PENDING
+              const isDone = job.status === 'DONE'
+              const isActive = !['DONE','FAILED'].includes(job.status)
               return (
-                <div key={job.jobId} className="card flex items-center gap-4 hover:border-indigo-600 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-mono font-bold text-sm mb-1">{job.repoName}</div>
-                    <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{job.repoUrl}</div>
+                <div key={job.jobId} className="card" style={{
+                  padding: '16px 20px',
+                  display: 'flex', alignItems: 'center', gap: 16,
+                  transition: 'border-color 0.15s',
+                }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-md)'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                >
+                  {/* Status dot */}
+                  <StatusBadge status={job.status} />
+
+                  {/* Repo info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'IBM Plex Mono', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {job.repoName || job.jobId}
+                    </div>
+                    <div style={{ fontFamily: 'IBM Plex Mono', fontSize: 10, color: 'var(--text-muted)', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {job.repoUrl}
+                    </div>
                   </div>
-                  <span className="text-xs font-mono px-2 py-1 rounded-full flex-shrink-0"
-                    style={{ background: colors.bg, color: colors.text }}>
-                    {job.status}
+
+                  {/* Progress (active) */}
+                  {isActive && (
+                    <div style={{ width: 120 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontFamily: 'IBM Plex Mono', fontSize: 9, color: 'var(--text-muted)' }}>{job.currentStage}</span>
+                        <span style={{ fontFamily: 'IBM Plex Mono', fontSize: 9, color: 'var(--accent)' }}>{job.progress}%</span>
+                      </div>
+                      <div style={{ height: 2, background: 'var(--border)', borderRadius: 99, overflow: 'hidden' }}>
+                        <div className="shimmer-bar" style={{ width: `${job.progress}%`, height: '100%', borderRadius: 99 }} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Time */}
+                  <span style={{ fontFamily: 'IBM Plex Mono', fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>
+                    {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '—'}
                   </span>
-                  <span className="text-xs flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
-                    {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : ''}
-                  </span>
-                  {job.status === 'DONE' ? (
-                    <Link to={`/report/${job.jobId}`}
-                      className="font-mono text-xs px-3 py-1.5 rounded-lg flex-shrink-0"
-                      style={{ background: 'var(--bg-elevated)', color: 'var(--accent-light)', border: '1px solid var(--border)' }}>
-                      View →
-                    </Link>
-                  ) : job.status !== 'FAILED' ? (
-                    <Link to={`/report/${job.jobId}`}
-                      className="font-mono text-xs px-3 py-1.5 rounded-lg flex-shrink-0"
-                      style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
-                      Watch
-                    </Link>
-                  ) : null}
-                  <button onClick={() => remove(job.jobId)}
-                    className="text-xs px-2 py-1 rounded flex-shrink-0 transition-colors"
-                    style={{ color: 'var(--text-muted)' }}>
-                    ✕
-                  </button>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {isDone && (
+                      <Link to={`/report/${job.jobId}`} className="btn btn-primary" style={{ fontSize: 10, padding: '5px 14px' }}>
+                        View Report
+                      </Link>
+                    )}
+                    {isActive && (
+                      <Link to={`/report/${job.jobId}`} className="btn btn-ghost" style={{ fontSize: 10, padding: '5px 14px' }}>
+                        Watch →
+                      </Link>
+                    )}
+                    <button onClick={() => handleDelete(job.jobId)} className="btn btn-ghost"
+                      style={{ fontSize: 10, padding: '5px 10px', color: 'var(--text-muted)' }}>
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )
             })}
           </div>
         )}
-      </main>
+      </div>
     </div>
   )
 }
